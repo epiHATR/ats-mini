@@ -50,8 +50,9 @@
 #define CMD_OFFTIMER   0x3600 //-+
 
 // UI Layouts
-#define UI_DEFAULT  0
-#define UI_SMETER   1
+#define UI_DEFAULT   0
+#define UI_SMETER    1
+#define UI_WATERFALL 2
 
 // Seek modes
 #define SEEK_DEFAULT  0

@@ -52,6 +52,7 @@ void drawScale(uint32_t freq); // Hz
 
 void drawLayoutDefault();
 void drawLayoutSmeter();
+void drawLayoutWaterfall();
 
 void drawAbout();
 void drawAboutHelp(uint8_t arrow);

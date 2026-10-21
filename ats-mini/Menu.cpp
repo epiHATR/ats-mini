@@ -10,6 +10,8 @@
 #include "Memories.h"
 #include "Patches.h"
 #include "Storage.h"
+#include "Ft8Local.h"
+#include "AudioCapture.h"
 
 #include <time.h>
 
@@ -190,7 +192,7 @@ int getTotalFMRegions() { return(ITEM_COUNT(fmRegions)); }
 // Mode Menu
 //
 
-const char *bandModeDesc[] = { "FM", "LSB", "USB", "AM" };
+const char *bandModeDesc[] = { "FM", "LSB", "USB", "AM", "FT8" };
 
 int getTotalModes() { return(ITEM_COUNT(bandModeDesc)); }
 
@@ -325,7 +327,7 @@ static uint8_t dateTimeSecond;
 //
 uint8_t uiLayoutIdx = 0;
 const char *const uiLayoutDesc[] =
-{ "Default", "S-Meter" };
+{ "Default", "S-Meter", "Waterfall" };
 
 int getTotalUILayouts() { return(ITEM_COUNT(uiLayoutDesc)); }
 
@@ -410,8 +412,8 @@ static const Step amSteps[] =
   { 1000000, "1M",   10 },
 };
 
-static const Step *steps[4] = { fmSteps, ssbSteps, ssbSteps, amSteps };
-static const uint8_t defaultStepIdx[4] = { 2, 5, 5, 1 };
+static const Step *steps[5] = { fmSteps, ssbSteps, ssbSteps, amSteps, ssbSteps };
+static const uint8_t defaultStepIdx[5] = { 2, 5, 5, 1, 5 };
 
 static int getLastStep(int mode)
 {
@@ -421,6 +423,7 @@ static int getLastStep(int mode)
     case LSB: return(LAST_ITEM(ssbSteps));
     case USB: return(LAST_ITEM(ssbSteps));
     case AM:  return(LAST_ITEM(amSteps));
+    case FT8: return(LAST_ITEM(ssbSteps));
   }
 
   return(0);
@@ -499,12 +502,12 @@ static const Bandwidth amBandwidths[] =
   { 0, "6.0k" }
 };
 
-static const Bandwidth *bandwidths[4] =
+static const Bandwidth *bandwidths[5] =
 {
-  fmBandwidths, ssbBandwidths, ssbBandwidths, amBandwidths
+  fmBandwidths, ssbBandwidths, ssbBandwidths, amBandwidths, ssbBandwidths
 };
 
-static const uint8_t defaultBwIdx[4] = { 0, 4, 4, 4 };
+static const uint8_t defaultBwIdx[5] = { 0, 4, 4, 4, 4 }; // FT8 default 3.0 kHz SSB filter
 
 static int getLastBandwidth(int mode)
 {
@@ -514,6 +517,7 @@ static int getLastBandwidth(int mode)
     case LSB: return(LAST_ITEM(ssbBandwidths));
     case USB: return(LAST_ITEM(ssbBandwidths));
     case AM:  return(LAST_ITEM(amBandwidths));
+    case FT8: return(LAST_ITEM(ssbBandwidths));
   }
 
   return(0);
@@ -544,6 +548,7 @@ static void setBandwidth()
       break;
     case LSB:
     case USB:
+    case FT8:
       // Set Audio
       rx.setSSBAudioBandwidth(idx);
       // If audio bandwidth selected is about 2 kHz or below, it is
@@ -675,7 +680,10 @@ void doSelectDigit(int16_t enc)
 void doVolume(int16_t enc)
 {
   volume = clamp_range(volume, enc, 0, 63);
-  rx.setVolume(volume);
+  if(ft8IsActive())
+    ft8ApplyAudio(); // FT8 keeps a fixed SI4732 level for the ADC
+  else
+    rx.setVolume(volume);
   if(enc) prefsRequestSave(SAVE_SETTINGS);
 }
 
@@ -820,7 +828,7 @@ static void doDspPatches(int16_t enc)
 
 void doCal(int16_t enc)
 {
-  if (currentMode == USB)
+  if (currentMode == USB || currentMode == FT8)
     bands[bandIdx].usbCal = clamp_range(bands[bandIdx].usbCal, 10*enc, -MAX_CAL, MAX_CAL);
   else if (currentMode == LSB)
     bands[bandIdx].lsbCal = clamp_range(bands[bandIdx].lsbCal, 10*enc, -MAX_CAL, MAX_CAL);
@@ -1354,6 +1362,9 @@ bool clickHandler(uint16_t cmd, bool shortPress)
 
 void selectBand(uint8_t idx, bool drawLoadingPatch)
 {
+  // Stop GPIO11 ADC before SI4732 I2C / SSB patch load (ADC2 continuous can stall the UI).
+  audioCaptureSetEnabled(false);
+
   // Silence clicks during reconfiguration using the configured hardware mute method.
   // https://github.com/esp32-si4732/ats-mini/discussions/103
   muteOn(MUTE_TEMP, true, !audioClamp);
@@ -1952,9 +1963,9 @@ static void drawCal(int x, int y, int sx)
   spr.setTextDatum(MC_DATUM);
 
   spr.setTextColor(TH.menu_param);
-  if (currentMode == USB)
+  if (currentMode == USB || currentMode == FT8)
   {
-    spr.drawString("USB", 40+x+(sx/2), 35+y, FONT_SMALL);
+    spr.drawString(currentMode == FT8 ? "FT8" : "USB", 40+x+(sx/2), 35+y, FONT_SMALL);
     spr.drawNumber(getCurrentBand()->usbCal, 40+x+(sx/2), 65+y, FONT_LARGE);
   }
   else if (currentMode == LSB)

@@ -32,6 +32,12 @@ Note: a new hardware revision with the LM4809 headphone amplifier has been spott
 
 * <https://www.printables.com/model/1295639-ats-mini-receiver-housing>
 
+## On-device FT8 (GPIO11 ADC)
+
+V4a/V4b boards already route radio audio to **ESP32 GPIO11** for digimode decoding — no soldering and no external ADC. Flash firmware with Waterfall enabled, open **UI Layout → Waterfall**, set **Mode → FT8** and **Date/Time** to UTC, then watch Serial for `AudioCapture rms=… rate=…` and `Ft8Local: decode …`.
+
+Wire **SI4732 pin 1 (LOUT) → 4.7–10 kΩ → GPIO11**, plus **10–47 nF GPIO11→GND**. ADC capture runs only in **Mode → FT8** (not in USB/LSB/AM on the Waterfall layout), mutes the speaker amp while sampling, and is stopped before SSB patch loads so the UI does not freeze. Status `b=` ≈ 1800–2200 means a good tap. See [discussion #162](https://github.com/esp32-si4732/ats-mini/discussions/162).
+
 ## Other interesting mods
 
 * [Si4732 MiniRX Modifications](https://peterneufeld.wordpress.com/2025/06/13/si4732a-minirx-modifications/) (also see [#73](https://github.com/esp32-si4732/ats-mini/discussions/73))

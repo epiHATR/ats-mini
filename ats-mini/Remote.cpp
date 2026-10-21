@@ -245,7 +245,7 @@ static void remotePrintStatus(Stream* stream, RemoteState* state)
                 VER_APP,
                 getReceiverFrequency(currentFrequency),
                 getCurrentBFO(),
-                ((currentMode == USB) ? getCurrentBand()->usbCal :
+                ((currentMode == USB || currentMode == FT8) ? getCurrentBand()->usbCal :
                  (currentMode == LSB) ? getCurrentBand()->lsbCal : 0),
                 getCurrentBand()->bandName,
                 bandModeDesc[currentMode],

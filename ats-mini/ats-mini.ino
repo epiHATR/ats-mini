@@ -19,6 +19,9 @@
 #include "TcpMode.h"
 #include "Splash.h"
 #include "Web.h"
+#include "AudioCapture.h"
+#include "Ft8Local.h"
+#include "Waterfall.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -72,7 +75,7 @@ int8_t SsbSoftMuteIdx = 4;              // Default SSB = 4, range = 0 to 32
 
 // Menu options
 uint8_t volume = DEFAULT_VOLUME;        // Volume, range = 0 (muted) - 63
-uint8_t currentSquelch[4] = {0};        // Squelch per mode: lower 7 bits = threshold, high bit selects SNR (1) vs RSSI (0)
+uint8_t currentSquelch[5] = {0};        // Squelch per mode (FM/LSB/USB/AM/FT8): lower 7 bits = threshold, high bit selects SNR (1) vs RSSI (0)
 uint8_t FmRegionIdx = 0;                // FM Region
 
 uint16_t currentBrt = 130;              // Display brightness, range = 10 to 255 in steps of 5
@@ -272,6 +275,9 @@ void setup()
 
   // Start Bluetooth LE, if necessary
   bleInit(bleModeIdx);
+
+  // On-device ADC audio / FT8 (GPIO11 factory tap on V4a/V4b; no-op on LILYGO)
+  ft8LocalInit();
 }
 
 
@@ -379,7 +385,8 @@ int getCurrentBFO()
 static void applyBFO()
 {
   const Band *band = getCurrentBand();
-  int calibration = currentMode == USB? band->usbCal : currentMode == LSB? band->lsbCal : 0;
+  int calibration = (currentMode == USB || currentMode == FT8)? band->usbCal :
+                    currentMode == LSB? band->lsbCal : 0;
   rx.setSSBBfo(-(getCurrentBFO() + calibration));
 }
 
@@ -431,7 +438,7 @@ void useBand(Band *band)
     else
     {
       // Configure SI4732 for SSB (SI4732 step not used, set to 0)
-      rx.setSSB(minFreq, maxFreq, receiverFreq, 0, currentMode);
+      rx.setSSB(minFreq, maxFreq, receiverFreq, 0, radioMode());
       // Initialize SSB with automatic AVC and AFC disabled
       rx.setSSBConfig(getCurrentBandwidth()->idx, 1, 0, 1, 0, 1);
       // G8PTN: Commented out
@@ -846,6 +853,10 @@ void loop()
 
   // Update clock display
   needRedraw |= clockUpdate();
+
+  // On-device ADC capture / FT8 (no-op without AUDIO_ADC_CAPTURE)
+  ft8LocalService(currentTime);
+  needRedraw |= waterfallTick(currentTime);
 
   // Periodically refresh the main screen
   // This covers the case where there is nothing else triggering a refresh

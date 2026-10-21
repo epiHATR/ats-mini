@@ -305,6 +305,7 @@ bool prefsLoad(uint32_t items)
     currentSquelch[LSB] = (squelch >> 8) & 0xff;
     currentSquelch[USB] = (squelch >> 16) & 0xff;
     currentSquelch[AM]  = (squelch >> 24) & 0xff;
+    currentSquelch[FT8] = currentSquelch[USB]; // FT8 shares USB squelch prefs
     FmRegionIdx    = prefs.getUChar("FmRegion", FmRegionIdx);   // FM region
     fmStereoIdx    = prefs.getUChar("FmStereo", fmStereoIdx);   // FM stereo mode
     audioClamp     = prefs.getBool("AudioClamp", true);        // Hardware audio clamp present

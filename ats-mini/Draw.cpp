@@ -457,6 +457,9 @@ void drawScreen()
     case UI_SMETER:
       drawLayoutSmeter();
       break;
+    case UI_WATERFALL:
+      drawLayoutWaterfall();
+      break;
     default:
       drawLayoutDefault();
       break;

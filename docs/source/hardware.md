@@ -45,7 +45,7 @@ The relevant columns are ESP32-S3-WROOM-1 "Pin Name" and "ATS-Mini Sketch Pin De
 | 16                        | IO46                         |                                    | pin_d5                     | LCD_DS                   |                          |
 | 17                        | IO9                          |                                    | pin_rd                     | LCD_RD                   |                          |
 | 18                        | IO10                         | PIN_AMP_EN                         |                            | AMP_EN                   | 1 = Audio Amp Enable     |
-| 19                        | IO11                         |                                    |                            | NC                       | Spare                    |
+| 19                        | IO11                         |                                    |                            | NC                       | Spare / V4a/V4b audio→ADC |
 | 20                        | IO12                         |                                    |                            | NC                       | Spare                    |
 | 21                        | IO13                         |                                    |                            | NC                       | Spare                    |
 | 22                        | IO14                         |                                    |                            | NC                       | Spare                    |

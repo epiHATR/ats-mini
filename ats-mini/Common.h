@@ -37,6 +37,7 @@ static constexpr const lgfx::IFont* FONT_DIGITS  = &lgfx::fonts::Font7;  // 48px
 #define LSB           1
 #define USB           2
 #define AM            3
+#define FT8           4  // Digimode UI; radio hardware runs as USB
 
 // RDS Modes
 #define RDS_PS        0b00000001  // Station name
@@ -225,7 +226,16 @@ extern uint8_t disableAgc;
 
 extern const int CALMax;
 
-static inline bool isSSB() { return(currentMode>FM && currentMode<AM); }
+static inline bool isSSB()
+{
+  return currentMode == LSB || currentMode == USB || currentMode == FT8;
+}
+
+// Mode value passed to the SI4732 (FT8 is USB on the chip).
+static inline uint8_t radioMode()
+{
+  return currentMode == FT8 ? USB : currentMode;
+}
 
 void useBand(Band *band);
 void setEncoderHalfStep(bool enabled);

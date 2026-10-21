@@ -36,6 +36,7 @@ HEADERS = \
 	Utils.h Button.h EIBI.h Remote.h BleMode.h TcpMode.h BlePeripheral.h \
 	BleUartPeripheral.h BleCentral.h BleHidCentral.h \
 	SI4735-fixed.h patch_init.h PatchParser.h Patches.h Splash.h Ota.h Web.h \
+	AudioCapture.h Ft8Local.h Waterfall.h \
 	$(wildcard Page*.h)
 
 SRC = \
@@ -45,7 +46,8 @@ SRC = \
 	Network.cpp Web.cpp Patches.cpp Ota.cpp Splash.cpp EIBI.cpp Scan.cpp About.cpp BleMode.cpp TcpMode.cpp \
 	BlePeripheral.cpp BleUartPeripheral.cpp \
 	BleCentral.cpp BleHidCentral.cpp \
-	Layout-Default.cpp Layout-SMeter.cpp
+	Layout-Default.cpp Layout-SMeter.cpp Waterfall.cpp \
+	AudioCapture.cpp Ft8Local.cpp
 
 all: build
 

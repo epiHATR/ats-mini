@@ -1,0 +1,1 @@
+Added a Waterfall UI layout and an FT8 mode (listed with FM/LSB/USB/AM). FT8 tunes as USB and fills a decode table under the waterfall from the ESP32 ADC on GPIO11 (V4a/V4b factory tap; V3 needs LOUT→GPIO11). In FT8 the SI4732 volume is fixed for the ADC and the speaker amp is muted; decode aligns to UTC 15 s slots and shows `t=s/15` plus measured Hz.

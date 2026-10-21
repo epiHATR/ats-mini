@@ -51,7 +51,7 @@ Controls are implemented through the encoder knob:
 
 The menu can be invoked by clicking the encoder button and is closed automatically after a couple of seconds.
 
-* **Mode** - FM (only available on the VHF band); LSB, USB, AM (available on other bands). The receiver doesn't support the NFM mode (on any band, including the CB) due to limitations of the SI4732 chip.
+* **Mode** - FM (only available on the VHF band); LSB, USB, AM, FT8 (available on other bands). **FT8** tunes the radio as USB and enables the Waterfall decode table. The receiver doesn't support the NFM mode (on any band, including the CB) due to limitations of the SI4732 chip.
 * **Band** - List of [Bands](#bands-table).
 * **Volume** - 0 (silent) ... 63 (max). The headphone volume level can be low (compared to the built-in speaker) due to limitation of the initial hardware design. Use short press to mute/unmute.
 * **VFO A/B** - Click to switch between two tuning slots, or short press (>0.5 sec) to copy the active slot into the inactive slot without switching. Both actions return to tuning. Each slot remembers its frequency (including SSB fine tuning), band, mode, step, and bandwidth. Tuning and memory recall affect only the active slot; other settings and memory slots are shared. Both slots and the active selection are saved after 10 seconds of inactivity. Initially, both slots contain the current tuning position.
@@ -75,7 +75,7 @@ The menu can be invoked by clicking the encoder button and is closed automatical
 * **Sleep Mode** - Locked - lock the encoder rotation during sleep; Unlocked - allow tuning the frequency in sleep mode; CPU Sleep - the maximum power saving mode. With the display being on, default brightness, and Wi-Fi the power consumption is about 170mA, without Wi-Fi 100mA, Locked/Unlocked modes draw about 70mA, CPU sleep mode draws about 40mA.
 * **Off Timer** - Short press the menu entry to shut down immediately into deep sleep, or click to adjust the timer (5–240 minutes, in 5-minute steps). While adjusting, turn the encoder to start or restart the timer; short press to disable it (Off). The remaining time alternates with the date and time in the info panel. The timer works during sleep and restarts on each power-up. After shutdown, cycle the power switch or press reset to restart the receiver. This is not a true power-off state: the receiver still draws some current.
 * **Theme** - Color theme.
-* **UI Layout** - Alternative UI layouts. For now there is just one alternative UI with large S-meter and S/N-meter.
+* **UI Layout** - Alternative UI layouts: **Default**, **S-Meter** (large S/N meters), and **Waterfall** (top-third spectrum plus an FT8 decode table when **Mode** is FT8). Waterfall uses the ESP32 ADC on **GPIO11** (factory tap on V4a/V4b; V3 needs **SI4732 pin 1 LOUT → GPIO11**). Use **Mode → FT8**, set **Date/Time** to accurate **UTC**, and USB-side FT8 frequencies. Status shows `t=`, `rms=`, and `b=` (ADC bias; good LOUT tap ≈ 1800–2200).
 * **Zoom Menu** - Display the currently selected menu item using a larger font (accessibility option).
 * **Scroll Dir.** - Menu scroll direction for clockwise encoder turn.
 * **RDS** - Radio Data System options: PS - radio station name, CT - date and time, RT - text, PTY - genre, ALL (EU/US) - everything. RDS CT should contain UTC date and time, but some stations incorrectly transmit local or completely bogus values. The clock is synchronized from RDS only once. To synchronize it again, disable and re-enable RDS CT or switch the receiver off and on.
